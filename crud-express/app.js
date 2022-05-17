@@ -3,9 +3,14 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var users = require('./routes/users');
-var students = require('./routes/student/StudentRoute');
-var professor = require('./routes/professor/ProfessorRoute');
+//mongo conn
+require('./db/mongo.connection');
+
+
+//var users = require('./routes/users');
+//var students = require('./routes/student/StudentRoute');
+var students = require('./routes/student/student.route');
+var professor = require('./routes/professor/professor.route');
 
 var app = express();
 
@@ -20,7 +25,7 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.use('/api/v1/users', users);
+//app.use('/api/v1/users', users);
 app.use('/crud-express/students', students);
 app.use('/crud-express/professor', professor);
 

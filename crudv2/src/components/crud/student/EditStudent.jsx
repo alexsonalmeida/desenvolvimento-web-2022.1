@@ -13,7 +13,7 @@ function EditStudent(props) {
     //https://pt-br.reactjs.org/docs/hooks-effect.html
     useEffect(
         () => {
-            axios.get('http://localhost:3002/crud-express/students/update/' + params.id)
+            axios.get('http://localhost:3002/crud-express/students/retrieve/' + params.id)
                 .then(
                     (res) => {
                         setName(res.data.name)
@@ -56,7 +56,7 @@ function EditStudent(props) {
                 <h2>
                     Editar Estudante
                 </h2>
-                <form onSubmit={handleSubmit}>
+                <form autoComplete='off' onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>Nome: </label>
                         <input type="text"

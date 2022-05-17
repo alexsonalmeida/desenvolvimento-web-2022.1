@@ -39,7 +39,7 @@ function CreateStudent() {
                 <h2>
                     Criar Estudante
                 </h2>
-                <form onSubmit={handleSubmit}>
+                <form autocomplete='off' onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>Nome: </label>
                         <input type="text"

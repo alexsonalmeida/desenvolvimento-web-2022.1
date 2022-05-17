@@ -38,7 +38,7 @@ const handleSubmit = (event) => {
                 <h2>
                     Criar Professor
                 </h2>
-                <form onSubmit={handleSubmit}>
+                <form autoComplete='off' onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>Nome: </label>
                         <input type="text"

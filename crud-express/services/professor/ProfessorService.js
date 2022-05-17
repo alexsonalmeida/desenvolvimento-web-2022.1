@@ -1,4 +1,4 @@
-const ProfessorModel = require('../../models/professor/ProfessorModel')
+const ProfessorModel = require('../../models/professors/ProfessorModel')
 
 let professors = [
     {_id:0, name:"Jefferson", university:"UFC", degree:"doutorado"},

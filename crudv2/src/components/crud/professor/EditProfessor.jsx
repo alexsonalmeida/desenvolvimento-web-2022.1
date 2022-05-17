@@ -11,7 +11,7 @@ function EditProfessor(props) {
 
     useEffect(
         () => {
-            axios.put('http://localhost:3002/crud-express/professors/update/' + params.id)
+            axios.get('http://localhost:3002/crud-express/professor/retrieve/' + params.id)
             .then((response)=>{
                 setName(response.data.name)
                 setUniversity(response.data.university)
@@ -47,7 +47,7 @@ function EditProfessor(props) {
                 <h2>
                     Editar Professor
                 </h2>
-                <form onSubmit={handleSubmit}>
+                <form autoComplete='off' onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>Nome: </label>
                         <input type="text"
