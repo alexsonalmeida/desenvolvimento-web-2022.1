@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+//import axios from "axios";
 //import { students } from './data.js'
+import FirebaseContext from "../../../utils/FirebaseContext";
+import FirebaseService from "../../../components/services/FirebaseStudentService";
+import RestrictedPage from "../../../utils/RestrictPage";
+
+const EditStudentPage = () =>
+    <FirebaseContext.Consumer>
+        {
+            (firebase) =>
+                <RestrictedPage isLogged={firebase.getUser() != null}>
+                    <EditStudent firebase={firebase} />
+                </RestrictedPage>
+        }
+    </FirebaseContext.Consumer>
 
 function EditStudent(props) {
     const [name, setName] = useState("")
@@ -13,6 +26,7 @@ function EditStudent(props) {
     //https://pt-br.reactjs.org/docs/hooks-effect.html
     useEffect(
         () => {
+            /*
             axios.get('http://localhost:3002/crud-express/students/retrieve/' + params.id)
                 .then(
                     (res) => {
@@ -25,11 +39,20 @@ function EditStudent(props) {
                     (error) => {
                         console.log(error)
                     }
+                )*/
+                FirebaseService.retrieve_promisse(
+                    props.firebase.getFirestoreDb(),
+                    (student)=>{
+                        setName(student.name)
+                        setCourse(student.course)
+                        setIRA(student.ira)
+                    },
+                    params.id
                 )
 
         }
         ,
-        [params.id]
+        [params.id, props.firebase]
     )
 
     const handleSubmit = (event) => {
@@ -38,6 +61,7 @@ function EditStudent(props) {
         {
            name,course,ira
         }
+        /*
         axios.put('http://localhost:3002/crud-express/students/update/' + params.id, updatedStudent)
             .then(
                 res => {
@@ -47,7 +71,14 @@ function EditStudent(props) {
                     navigate("/listStudent")
                 }
             )
-            .catch(error => console.log(error))
+            .catch(error => console.log(error))*/
+            FirebaseService.update(
+                props.firebase.getFirestoreDb(),
+                ()=>{
+                    navigate("/listStudent")
+                },
+                params.id,
+                updatedStudent)
     }
 
     return (
@@ -69,7 +100,7 @@ function EditStudent(props) {
                         <label>Curso: </label>
                         <input type="text"
                             className="form-control"
-                            value={course ?? ""}
+                            value={(course == null || course === undefined) ? "" : course}
                             name="course"
                             onChange={(event) => { setCourse(event.target.value) }} />
                     </div>
@@ -77,7 +108,7 @@ function EditStudent(props) {
                         <label>IRA: </label>
                         <input type="text"
                             className="form-control"
-                            value={ira ?? 0}
+                            value={(ira == null || ira === undefined) ? "" : ira}
                             name="ira"
                             onChange={(event) => { setIRA(event.target.value) }} />
                     </div>
@@ -93,4 +124,4 @@ function EditStudent(props) {
     );
 }
 
-export default EditStudent
+export default EditStudentPage

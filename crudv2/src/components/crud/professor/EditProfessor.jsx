@@ -2,6 +2,20 @@ import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+import FirebaseContext from "../../../utils/FirebaseContext";
+import FirebaseService from "../../../components/services/FirebaseProfessorService";
+import RestrictedPage from "../../../utils/RestrictPage";
+
+const EditProfessorPage = () =>
+    <FirebaseContext.Consumer>
+        {
+            (firebase) =>
+                <RestrictedPage isLogged={firebase.getUser() != null}>
+                    <EditProfessor firebase={firebase} />
+                </RestrictedPage>
+        }
+    </FirebaseContext.Consumer>
+
 function EditProfessor(props) {
     const [name, setName] = useState("")
     const [university, setUniversity] = useState("")
@@ -11,16 +25,26 @@ function EditProfessor(props) {
 
     useEffect(
         () => {
+            /*
             axios.get('http://localhost:3002/crud-express/professor/retrieve/' + params.id)
             .then((response)=>{
                 setName(response.data.name)
                 setUniversity(response.data.university)
                 setDegree(response.data.degree)
             })
-            .catch(error => console.log(error))
+            .catch(error => console.log(error))*/
+            FirebaseService.retrieve_promisse(
+                props.firebase.getFirestoreDb(),
+                (professor)=>{
+                    setName(professor.name)
+                    setUniversity(professor.university)
+                    setDegree(professor.degree)
+                },
+                params.id
+            )           
 
         },
-        [params.id]
+        [params.id, props.firebase]
     )
 
     const handleSubmit = (event) => {
@@ -29,6 +53,7 @@ function EditProfessor(props) {
         {
            name,university,degree
         }
+        /*
         axios.put('http://localhost:3002/crud-express/professor/update/' + params.id, updatedProfessor)
             .then(
                 res => {
@@ -38,7 +63,14 @@ function EditProfessor(props) {
                     navigate("/listProfessor")
                 }
             )
-            .catch(error => console.log(error))
+            .catch(error => console.log(error))*/
+            FirebaseService.update(
+                props.firebase.getFirestoreDb(),
+                ()=>{
+                    navigate("/listProfessor")
+                },
+                params.id,
+                updatedProfessor)
     }
 
     return (
@@ -60,7 +92,7 @@ function EditProfessor(props) {
                         <label>Universidade: </label>
                         <input type="text"
                             className="form-control"
-                            value={university ?? ""}
+                            value={(university == null || university === undefined) ? "" : university}
                             name="university"
                             onChange={(event) => { setUniversity(event.target.value) }} />
                     </div>
@@ -68,7 +100,7 @@ function EditProfessor(props) {
                         <label>Titulação: </label>
                         <input type="text"
                             className="form-control"
-                            value={degree ?? 0}
+                            value={(degree == null || degree === undefined) ? "" : degree}
                             name="degree"
                             onChange={(event) => { setDegree(event.target.value) }} />
                     </div>
@@ -84,4 +116,4 @@ function EditProfessor(props) {
     );
 }
 
-export default EditProfessor
+export default EditProfessorPage

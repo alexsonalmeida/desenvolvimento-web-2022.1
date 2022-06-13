@@ -1,6 +1,7 @@
 import * as React from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useNavigate} from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css'
+import { useState } from "react";
 //import "./App.css";
 
 import Home from "./components/Home";
@@ -14,7 +15,43 @@ import CreateProfessor from "./components/crud/professor/CreateProfessor";
 import ListProfessor from "./components/crud/professor/ListProfessor";
 import EditProfessor from "./components/crud/professor/EditProfessor";
 
-function App() {
+import FirebaseContext from "./utils/FirebaseContext";
+import FirebaseUserService from "./components/services/FirebaseUserService";
+
+const AppPage = () => 
+<FirebaseContext.Consumer>
+  {(firebase) => <App firebase = {firebase}/>}
+</FirebaseContext.Consumer>
+
+function App(props) {
+  const [logged, setLogged] = useState(false)
+  const navigate = useNavigate()
+
+  const renderUserLogoutButton = () => {
+    if (props.firebase.getUser() != null)
+    return (
+        <div style={{ marginRight: 20 }}>
+          Olá, as3904527@gmail.com
+          <button style={{ marginLeft: 10 }} onClick={()=>logout()} >Logout</button>
+        </div>
+    )
+  }
+
+  const logout = () => {
+    if (props.firebase.getUser() != null) {
+      FirebaseUserService.logout(
+        props.firebase.getAuthentication(),
+          (res) => {
+            if (res) {
+              props.firebase.setUser(null)
+              setLogged(false)
+              navigate('/')
+            }
+          }
+        )
+    }
+  }
+
   return (
     <div className="container">
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -55,9 +92,10 @@ function App() {
             </li>
           </ul>
         </div>
+        {renderUserLogoutButton()}
       </nav>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home setLogged={setLogged}/>} />
         <Route path="about" element={<About />} />
         <Route path="createStudent" element={<CreateStudent />} />
         <Route path="listStudent" element={<ListStudent />} />
@@ -67,8 +105,7 @@ function App() {
         <Route path="editProfessor/:id" element={<EditProfessor />} />
       </Routes>
     </div>
-
   );
 }
 
-export default App
+export default AppPage

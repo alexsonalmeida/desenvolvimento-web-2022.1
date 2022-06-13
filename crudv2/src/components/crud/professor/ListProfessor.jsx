@@ -1,27 +1,53 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import FirebaseProfessorService from "../../services/FirebaseProfessorService";
 
 import ProfessorTableRow from "./ProfessorTableRow";
 
-function ListProfessor() {
+import FirebaseContext from "../../../utils/FirebaseContext";
+import RestrictedPage from "../../../utils/RestrictPage";
+
+const ListProfessorPage = () => 
+    <FirebaseContext.Consumer>
+        {
+            (firebase) => 
+                    <RestrictedPage isLogged = {firebase.getUser() != null}>
+                        <ListProfessor firebase = {firebase}/>
+                    </RestrictedPage>
+        }
+    </FirebaseContext.Consumer>
+
+function ListProfessor(props) {
     const [professors, setProfessors] = useState([])
+    const [loading, setLoading] = useState(false)
 
     useEffect(
         () => {
+            /*
             axios.get("http://localhost:3002/crud-express/professor/list")
             .then (
                 (response) => {
-                    /*console.log("Deu certo")
-                    console.log(response.data)*/
+                    console.log("Deu certo")
+                    console.log(response.data)
                     setProfessors(response.data)
                 }
             )
             .catch (
                 (error) => console.log(error)
+            )*/
+            setLoading(true)
+            FirebaseProfessorService.list_onSnapshot(
+                props.firebase.getFirestoreDb(), 
+                (professors) => {
+                    //console.log(professors)
+                    setProfessors(professors)
+                    setLoading(false)
+                }
             )
-        },
-        []
+        }
+        ,
+        [props]
     )
 
     function deleteProfessorById(_id) {
@@ -39,12 +65,23 @@ function ListProfessor() {
     }
 
     function generateTable() {
+        if (loading) {
+            return (
+                <tr>
+                    <td colSpan={5}>
+                        <div class="text-center">
+                            <div class="spinner-border" role="status" style={{width:'3rem', height:'4rem'}}/>
+                        </div>
+                    </td>
+                </tr>
+            )
+        }
         if (!professors) return
         return professors.map(
             (professor, i) => {
                 return <ProfessorTableRow professor={professor} key={i} deleteProfessorById={deleteProfessorById}/>
             }
-        )
+        )  
     }
 
     return (
@@ -75,4 +112,4 @@ function ListProfessor() {
     );
 }
 
-export default ListProfessor
+export default ListProfessorPage

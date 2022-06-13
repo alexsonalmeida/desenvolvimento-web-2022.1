@@ -2,15 +2,23 @@ import React from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
+import FirebaseService from "../../../components/services/FirebaseStudentService";
+
 const StudentTableRow = (props) => {
     const {_id,name,course,ira} = props.student
 
     function deleteStudent() {
         if (window.confirm(`Deseja excluir o elemento de ID: ${_id}?`)) {
+            /*
             //axios.delete(`http://localhost:3001/students/${_id}`)
             axios.delete(`http://localhost:3002/crud-express/students/delete/${_id}`)
                 .then(response => props.deleteStudentById(_id))
-                .catch(error => console.log(error))
+                .catch(error => console.log(error))*/
+                FirebaseService.delete(
+                    props.firestoreDb,
+                    ()=>{},
+                    _id
+                )
         }
     }
 

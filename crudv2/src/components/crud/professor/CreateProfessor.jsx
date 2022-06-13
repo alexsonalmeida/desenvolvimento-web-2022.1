@@ -1,17 +1,33 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from "react-router-dom";
-import axios from 'axios';
+//import axios from 'axios';
 
-function CreateProfessor() {
+import FirebaseContext from "../../../utils/FirebaseContext";
+import FirebaseProfessorService from '../../services/FirebaseProfessorService';
+import RestrictedPage from "../../../utils/RestrictPage";
+
+
+const CreateProfessorPage = () => 
+    <FirebaseContext.Consumer>
+    {
+        (firebase) => 
+                <RestrictedPage isLogged = {firebase.getUser() != null}>
+                    <CreateProfessor firebase = {firebase}/>
+                </RestrictedPage>
+    }
+    </FirebaseContext.Consumer>
+
+function CreateProfessor(props) {
     const [name, setName] = useState("")
     const [university, setUniversity] = useState("")
-    const [degree, setDegree] = useState("Graduado")
+    const [degree, setDegree] = useState("")
     const navigate = useNavigate()
 
 const handleSubmit = (event) => {
     event.preventDefault()
 
     const newProfessor = { name, university, degree }
+    /*
     //axios.post('http://localhost:3001/students', newStudent)
     axios.post('http://localhost:3002/crud-express/professor/create', newProfessor)
         .then(
@@ -25,7 +41,21 @@ const handleSubmit = (event) => {
             (error) => {
                 console.log(error)
             }
-        )
+        )*/
+        
+        FirebaseProfessorService.create(
+            props.firebase.getFirestoreDb(),
+            () => {
+                navigate("/listProfessor")
+            }, newProfessor)
+
+        /*
+        FirebaseProfessorService.create( 
+            props.firebase.getFirestoreDb(),
+            () => {
+                navigate("/listProfessor")
+            },
+            newProfessor)*/
 
     console.log(name)
     console.log(university)
@@ -51,7 +81,7 @@ const handleSubmit = (event) => {
                         <label>Universidade: </label>
                         <input type="text"
                             className="form-control"
-                            value={university ?? ""}
+                            value={(university == null || university === undefined) ? "" : university}
                             name="university"
                             onChange={(event) => { setUniversity(event.target.value) }} />
                     </div>
@@ -59,7 +89,7 @@ const handleSubmit = (event) => {
                         <label>Titulação: </label>
                         <input type="text"
                             className="form-control"
-                            value={degree ?? 0}
+                            value={(degree == null || degree === undefined) ? "" : degree}
                             name="degree"
                             onChange={(event) => { setDegree(event.target.value) }} />
                     </div>
@@ -76,4 +106,4 @@ const handleSubmit = (event) => {
 }
 
 
-export default CreateProfessor
+export default CreateProfessorPage

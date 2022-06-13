@@ -1,9 +1,23 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+//import axios from "axios";
+import FirebaseContext from "../../../utils/FirebaseContext";
+import FirebaseStudentService from "../../../components/services/FirebaseStudentService";
+import RestrictedPage from "../../../utils/RestrictPage";
+import ListStudent from "./ListStudent";
 
-function CreateStudent() {
 
+const CreateStudentPage = () => 
+    <FirebaseContext.Consumer>
+    {
+        (firebase) => 
+                <RestrictedPage isLogged = {firebase.getUser() != null}>
+                    <CreateStudent firebase = {firebase}/>
+                </RestrictedPage>
+    }
+    </FirebaseContext.Consumer>
+
+function CreateStudent(props) {
     const [name, setName] = useState("")
     const [course, setCourse] = useState("")
     const [ira, setIRA] = useState(0)
@@ -13,6 +27,7 @@ function CreateStudent() {
         event.preventDefault()
 
         const newStudent = { name, course, ira }
+        /*
         //axios.post('http://localhost:3001/students', newStudent)
         axios.post('http://localhost:3002/crud-express/students/create', newStudent)
             .then(
@@ -27,6 +42,14 @@ function CreateStudent() {
                     console.log(error)
                 }
             )
+        */
+
+        FirebaseStudentService.create( 
+            props.firebase.getFirestoreDb(),
+            () => {
+                navigate("/listStudent")
+            },
+            newStudent)
 
         console.log(name)
         console.log(course)
@@ -52,7 +75,7 @@ function CreateStudent() {
                         <label>Curso: </label>
                         <input type="text"
                             className="form-control"
-                            value={course ?? ""}
+                            value={(course == null || course === undefined) ? "" : course}
                             name="course"
                             onChange={(event) => { setCourse(event.target.value) }} />
                     </div>
@@ -60,7 +83,7 @@ function CreateStudent() {
                         <label>IRA: </label>
                         <input type="text"
                             className="form-control"
-                            value={ira ?? 0}
+                            value={(ira == null || ira === undefined) ? "" : ira}
                             name="ira"
                             onChange={(event) => { setIRA(event.target.value) }} />
                     </div>
@@ -76,4 +99,4 @@ function CreateStudent() {
     );
 }
 
-export default CreateStudent
+export default CreateStudentPage
