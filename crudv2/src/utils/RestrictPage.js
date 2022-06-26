@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 
-const RestrictedPage = ({isLogged, children}) => {
-    if (isLogged) {
-        return children
+const RestrictedPage = (props) => {
+    if (props.isLogged) {
+        return props.children
     }
     //Caso user seja nulo
     return (

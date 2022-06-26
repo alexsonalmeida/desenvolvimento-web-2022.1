@@ -4,40 +4,56 @@ import { Link, useNavigate } from "react-router-dom";
 
 import FirebaseUserService from "../components/services/FirebaseUserService";
 import FirebaseContext from "../utils/FirebaseContext";
-//import MyToast from "../utils/MyToast";
+//import MyToast from "../utils/MyToast"; //TOAST
 
-const HomePage = ({setLogged,setShowToast,setToast}) =>
+const SignUpPage = ({setLogged,setShowToast,setToast}) =>
     <FirebaseContext.Consumer>
-        {(firebase) => <Home 
+        {(firebase) => <SignUp 
                             firebase={firebase} 
                             setLogged={setLogged} 
                             setShowToast={setShowToast} 
                             setToast={setToast}/>}
     </FirebaseContext.Consumer>
 
-function Home(props) {
+function SignUp(props) {
+
     const [login, setLogin] = useState('')
     const [password, setPassword] = useState('')
+    const [repassword, setRepassword] = useState('')
     const [loading, setLoading] = useState(false)
-    const [validate,setValidate] = useState({login:'',password:''})
-    //const [showToast, setShowToast] = useState(false);
+
+    //const [showToast, setShowToast] = useState(false); //TOAST
+    //const [toast, setToast] = useState({header:'',body:''}) //TOAST
+    
+    const [validate,setValidate] = useState({login:'',password:'',repassword:''})
     const navigate = useNavigate()
 
     const validateFields = () => {
         let res = true
-        setValidate({login:'',password:''})
+        setValidate({login:'',password:'',repassword:''})
         
-        if(login === '' || password === ''){
+        if(password!==repassword){
+            props.setToast({header:'Erro!',body:'Repita a mesmo senha!'})
+            props.setShowToast(true)
+            setLoading(false)
+            setValidate({login:'',password:'is-invalid',repassword:'is-invalid'})
+            res = false
+           
+        }
+
+        if(login === '' || password === '' || repassword === ''){
             props.setToast({header:'Erro!',body:'Preencha todos os campos.'})
             props.setShowToast(true)
             setLoading(false)
             res = false
-            let validateObj = {login:'',password:''}
+            let validateObj = {login:'',password:'',repassword:''}
             if(login === '') validateObj.login = 'is-invalid'
             if(password === '') validateObj.password = 'is-invalid'
+            if(repassword === '') validateObj.repassword = 'is-invalid'
             setValidate(validateObj)
         }
 
+         
         return res
     }
 
@@ -45,7 +61,26 @@ function Home(props) {
         event.preventDefault()
         setLoading(true)
         if(!validateFields()) return
-        FirebaseUserService.login(
+        FirebaseUserService.signup(
+            props.firebase.getAuthentication(),
+            login,
+            password,
+            (res,content) => {
+                if (res) {
+                    //console.log(user.email)
+                    setLoading(false)
+                    props.firebase.setUser(content)
+                    props.setLogged(true)
+                    navigate('/listStudent')
+                } else {
+                    //alert('Usuário e/ou senha incorretos!')
+                    props.setToast({header:'Erro!',body:content})
+                    props.setShowToast(true)
+                    setLoading(false)
+                }
+            }
+        )
+        /*FirebaseUserService.login(
             props.firebase.getAuthentication(),
             login,
             password,
@@ -59,11 +94,10 @@ function Home(props) {
                 } else {
                     //alert('Usuário e/ou senha incorretos!')
                     setLoading(false)
-                    props.setToast({header:'Erro!',body:'Login e/ou Senha incorreto(s).'})
-                    props.setShowToast(true)
+                    setShowToast(true)
                 }
             }
-        )
+        )*/
     }
 
     const renderSubmitButton = () => {
@@ -80,19 +114,31 @@ function Home(props) {
         return (
             <>
                 <div className="form-group" style={{ paddingTop: 20 }}>
-                    <input type="submit" value="Efetuar Login" className="btn btn-primary" />
+                    <input type="submit" value="Efetuar Cadastro" className="btn btn-primary" />
                 </div>
             </>
         )
     }
 
+    //TOAST
+    /*const renderToast = () => {
+        return <MyToast
+            show={showToast}
+            header={toast.header}
+            body={toast.body}
+            setShowToast={setShowToast}
+            bg='secondary'
+        />
+    }*/
+
     return (
         <div className="content-login" style={{ marginTop: 50 }}>
+            {/*Toast*/}
             <main style={{ width: '40%' }}>
-                <h2>Login</h2>
+                <h2>Cadastre-se</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label>Login* </label>
+                        <label>Login*</label>
                         <input type="text"
                             className={`form-control ${validate.login}`}
                             value={(login == null || login === undefined) ? "" : login}
@@ -107,12 +153,17 @@ function Home(props) {
                             name="password"
                             onChange={(event) => { setPassword(event.target.value) }} />
                     </div>
+                    <div className="form-group">
+                        <label>Repita a Senha* </label>
+                        <input type="password"
+                            className={`form-control ${validate.repassword}`}
+                            value={repassword ?? ""}
+                            name="repassword"
+                            onChange={(event) => { setRepassword(event.target.value) }} />
+                    </div>
                     {renderSubmitButton()}
                 </form>
             </main>
-            <nav>
-                <Link to="/signup">Cadastre-se</Link>
-            </nav>
             <nav>
                 <Link to="/about">About</Link>
             </nav>
@@ -120,4 +171,4 @@ function Home(props) {
     );
 }
 
-export default HomePage
+export default SignUpPage

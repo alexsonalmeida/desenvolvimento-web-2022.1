@@ -34,15 +34,16 @@ export default class FirebaseProfessorService {
             })
     }
 
-    static create = (firestore, callback, data) => {
-        addDoc(collection(firestore, 'professor'), data)
-            .then(
-                (doc) => {
-                    console.log("CREATE:" + doc.id)
-                    callback()
-                }
-            )
-            .catch((error) => console.log(error))
+    static create = (firestore, callback, professor) => {
+        const coll = collection(firestore,'professor')
+        addDoc(coll,professor)
+        .then(
+            (document)=>{
+                console.log('CREATE: ' + document.id)
+                callback()
+            }
+        )
+        .catch((error) => console.log(error))
     }
 
 
