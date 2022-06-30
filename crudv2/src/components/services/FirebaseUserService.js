@@ -1,7 +1,23 @@
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth'
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendEmailVerification } from 'firebase/auth'
 
 export default class FirebaseUserService {
+    static sendEmail = (auth,callback) => {
+        sendEmailVerification(auth.currentUser)
+        .then(
+            () => {
+                callback(true)
+            }
+        )
+        .catch(
+            (error) => {
+                callback(false,error.code)
+                console.log(error.code)
+            }
+            
+        )
+    }
     static signup = (auth, login, password, callback) => {
+
         createUserWithEmailAndPassword(
             auth,
             login,
@@ -9,7 +25,20 @@ export default class FirebaseUserService {
         )
             .then(
                 (userCredential) => {
-                    callback(true,userCredential.user)
+                    sendEmailVerification(auth.currentUser)
+                    .then(
+                        () => {
+                            callback(true,userCredential.user)
+                        }
+                    )
+                    .catch(
+                        (error) => {
+                            callback(false,error.code)
+                            console.log(error.code)
+                        }
+                        
+                    )
+                    //callback(true,userCredential.user)
                 }
             )
             .catch(

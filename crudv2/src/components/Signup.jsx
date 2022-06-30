@@ -32,16 +32,15 @@ function SignUp(props) {
         let res = true
         setValidate({login:'',password:'',repassword:''})
         
-        if(password!==repassword){
+        if (password !== repassword) {
             props.setToast({header:'Erro!',body:'Repita a mesmo senha!'})
             props.setShowToast(true)
             setLoading(false)
             setValidate({login:'',password:'is-invalid',repassword:'is-invalid'})
             res = false
-           
         }
 
-        if(login === '' || password === '' || repassword === ''){
+        if (login === '' || password === '' || repassword === '') {
             props.setToast({header:'Erro!',body:'Preencha todos os campos.'})
             props.setShowToast(true)
             setLoading(false)
@@ -53,7 +52,6 @@ function SignUp(props) {
             setValidate(validateObj)
         }
 
-         
         return res
     }
 

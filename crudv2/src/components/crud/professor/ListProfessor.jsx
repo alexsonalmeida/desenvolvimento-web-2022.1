@@ -13,7 +13,8 @@ const ListProfessorPage = ({ setShowToast, setToast }) =>
         {
             (firebase) => {
                 return (
-                    <RestrictPage isLogged={firebase.getUser() != null}>
+                    <RestrictPage isLogged={firebase.getUser() != null}
+                    isEmailVerified={(firebase.getUser() != null)?firebase.getUser().emailVerified:false}>
                         <ListProfessor
                             firebase={firebase}
                             setShowToast={setShowToast}

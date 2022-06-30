@@ -11,7 +11,8 @@ const CreateStudentPage = ({setShowToast,setToast}) =>
     {
         (firebase) => {
             return (
-                <RestrictPage isLogged={firebase.getUser()!=null}>
+                <RestrictPage isLogged={firebase.getUser()!=null}
+                isEmailVerified={(firebase.getUser() != null)?firebase.getUser().emailVerified:false}>
                     <CreateStudent 
                         firebase={firebase}
                         setShowToast={setShowToast}

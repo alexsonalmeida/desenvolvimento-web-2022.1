@@ -12,7 +12,8 @@ const EditProfessorPage = ({ setShowToast, setToast }) =>
         {
             (firebase) => {
                 return (
-                    <RestrictPage isLogged={firebase.getUser() != null}>
+                    <RestrictPage isLogged={firebase.getUser() != null}
+                    isEmailVerified={(firebase.getUser() != null)?firebase.getUser().emailVerified:false}>
                         <EditProfessor
                             firebase={firebase}
                             setShowToast={setShowToast}
